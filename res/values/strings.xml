@@ -1,0 +1,11 @@
+<resources>
+
+    <string name="app_name">V4</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_simple_base">SimpleBaseActivity</string>
+    <string name="title_1">Mauro</string>
+    <string name="title_2">Letras</string>
+    <string name="start">EMPIEZA !!!</string>
+
+</resources>
