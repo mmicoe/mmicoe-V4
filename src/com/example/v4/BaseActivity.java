@@ -1,6 +1,7 @@
 package com.example.v4;
 
 import org.andengine.engine.Engine;
+import org.andengine.engine.camera.BoundCamera;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
@@ -37,13 +38,15 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	public Font mFont;
 	public Camera mCamera;
 	
+	public BoundCamera mBoundChaseCamera;
+	
 	//A reference to the current scene
 	public Scene mCurrentScene;
 	public static BaseActivity instance;
 	
 	public Engine mEngine;
 	 
-	public static BitmapTextureAtlas mBitmapTextureAtlas;
+	private BitmapTextureAtlas mBitmapTextureAtlas;
 	public TiledTextureRegion mPlayerTextureRegion;
 	
 	@Override
@@ -51,10 +54,11 @@ public class BaseActivity extends SimpleBaseGameActivity {
 		// TODO Auto-generated method stub
 	
 		    instance = this;
-		   
-		    mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		    return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mCamera);
-	   
+		    
+		    //mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		    //return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mCamera);
+		    mBoundChaseCamera = new BoundCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+		    return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mBoundChaseCamera);
 	}
 	
 	@Override
@@ -65,11 +69,10 @@ public class BaseActivity extends SimpleBaseGameActivity {
 		
 		    mFont = FontFactory.create(this.getFontManager(),this.getTextureManager(), 256, 256,Typeface.create(Typeface.DEFAULT, Typeface.BOLD), 32);
 		    mFont.load();
-		  
-		    
+		 
 		    //Recursos Personaje
-		    mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 72, 128);
-			mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(mBitmapTextureAtlas,this.getBaseContext(), "enemy.png", 0, 0, 3, 4);
+		    mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 72, 128, TextureOptions.DEFAULT);
+			mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mBitmapTextureAtlas,this, "player.png", 0, 0, 3, 4);
 			//mGrassBackground = new RepeatingSpriteBackground(BaseActivity.getSharedInstance().CAMERA_WIDTH,BaseActivity.getSharedInstance().CAMERA_HEIGHT,BaseActivity.getSharedInstance().getTextureManager(), AssetBitmapTextureAtlasSource.create(BaseActivity.getSharedInstance().getAssets(), "gfx/background_grass.png"),BaseActivity.getSharedInstance().getVertexBufferObjectManager());
 			mBitmapTextureAtlas.load();
 			

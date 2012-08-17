@@ -13,14 +13,14 @@ public class MenuInicialScene extends MenuScene implements IOnMenuItemClickListe
 		
 	public MenuInicialScene(){
 		
-		super(BaseActivity.getSharedInstance().mCamera);
+		super(BaseActivity.getSharedInstance().mBoundChaseCamera);
 		
 		activity = BaseActivity.getSharedInstance();
 
 		setBackground(new Background(0.09804f, 0.6274f, 0.8784f));
 		
 		IMenuItem startButton = new TextMenuItem(MENU_START, activity.mFont, activity.getString(R.string.start), activity.getVertexBufferObjectManager());
-		startButton.setPosition(mCamera.getWidth() / 2 - startButton.getWidth() / 2, mCamera.getHeight() / 2 - startButton.getHeight() / 2);
+		startButton.setPosition(activity.mBoundChaseCamera.getWidth() / 2 - startButton.getWidth() / 2, activity.mBoundChaseCamera.getHeight() / 2 - startButton.getHeight() / 2);
 		addMenuItem(startButton);
 
 		setOnMenuItemClickListener(this);

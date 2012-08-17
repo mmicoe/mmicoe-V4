@@ -13,10 +13,12 @@ import org.andengine.entity.modifier.LoopEntityModifier;
 import org.andengine.entity.modifier.PathModifier;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.util.Constants;
+import org.andengine.util.math.MathUtils;
 
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 
@@ -24,45 +26,51 @@ import org.andengine.entity.modifier.LoopEntityModifier.ILoopEntityModifierListe
 import org.andengine.entity.modifier.PathModifier.IPathModifierListener;
 import org.andengine.entity.modifier.PathModifier.Path;
 import org.andengine.entity.modifier.ParallelEntityModifier;
+import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXTile;
+import org.andengine.input.touch.TouchEvent;
 
-public class Juego extends Scene {
+
+public class Juego extends Scene{
     
 	final int BOUND_CAMERA_WIDTH = 480;
 	final int BOUND_CAMERA_HEIGHT = 320;
 	
-	public BoundCamera mBoundChaseCamera;
+	private BoundCamera mBoundChaseCamera;
 	
 	public static Juego instance;
 	
-	public Personaje perso1;
-	public Escena1 level1;
-	
-	
-	public Juego() {
+	BaseActivity base_activity;
+
+  
+	public Juego()
+	{
+	  
+
+		instance = this;
+		base_activity = BaseActivity.getSharedInstance();
 		
 		
-		 
-		 instance = this;
-		 
-		final BoundCamera mBoundChaseCamera = new BoundCamera(0, 0, 480, 320);
-		 
 		//Añadimos escena1
 		Escena1 e1 = new Escena1();
-		attachChild(e1.tmxLayer);
+		Personaje p1 = new Personaje();
 		
-		
-		 mBoundChaseCamera.setBounds(0,0,e1.tmxLayer.getHeight(),e1.tmxLayer.getWidth());
-	     mBoundChaseCamera.setBoundsEnabled(true);
-		
+		attachChild(e1.getLayer());
 		 
-		 Personaje p1 = new Personaje();
-		 mBoundChaseCamera.setChaseEntity(p1.sprite);
-		 
-		 final Path path = new Path(5).to(0, 160).to(0, 500).to(600, 500).to(600, 160).to(0, 160);
+		base_activity.mBoundChaseCamera.setBounds(0,0,e1.getLayer().getHeight(),e1.getLayer().getWidth());
+		base_activity.mBoundChaseCamera.setBoundsEnabled(true);
 		
+		//Añadimos Personaje a la escena:
+		attachChild(p1.getSprite());
+		
+		base_activity.mBoundChaseCamera.setChaseEntity(p1.getSprite());
+		
+		// ************************************************
+		 
+		 //**************************************************************
  
-		 p1.sprite.registerEntityModifier(new LoopEntityModifier(new PathModifier(30, path, null, new IPathModifierListener() {
+		 final Path path = new Path(5).to(0, 160).to(0, 500).to(600, 500).to(600, 160).to(0, 160);
+		 p1.getSprite().registerEntityModifier(new LoopEntityModifier(new PathModifier(30, path, null, new IPathModifierListener() {
 				@Override
 				public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
 
@@ -70,9 +78,7 @@ public class Juego extends Scene {
 
 				@Override
 				public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
-					switch(pWaypointIndex) {
-						
-					}
+					System.out.println("EN JUEGO PERSONAJE *****");
 				}
 
 				@Override
@@ -84,11 +90,9 @@ public class Juego extends Scene {
 				public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
 
 				}
-			}))); 
+			})));
+	 
 
-		
-		 //**********************************
-		 
 		 registerUpdateHandler(new IUpdateHandler() {
 				@Override
 				public void reset() { }
@@ -97,13 +101,9 @@ public class Juego extends Scene {
 				public void onUpdate(final float pSecondsElapsed) {
 					
 				}
-			});
+			}); 
 		 
-		 //Añadimos Personaje a la escena:
-		 attachChild(p1.sprite);
-		 registerTouchArea(p1.sprite);
 		 
-		
 	}
 	
 public static Juego getSharedInstance() {

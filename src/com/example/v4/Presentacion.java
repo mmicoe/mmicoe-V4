@@ -24,14 +24,14 @@ public class Presentacion extends Scene {
 		  Text title1 = new Text(0, 0, activity.mFont, activity.getString(R.string.title_1), activity.getVertexBufferObjectManager());
 		  Text title2 = new Text(0, 0, activity.mFont, activity.getString(R.string.title_2), activity.getVertexBufferObjectManager());
 
-		  title1.setPosition(-title1.getWidth(), activity.mCamera.getHeight() / 2);
-		  title2.setPosition(activity.mCamera.getWidth(), activity.mCamera.getHeight() / 2);
+		  title1.setPosition(-title1.getWidth(), activity.mBoundChaseCamera.getHeight() / 2);
+		  title2.setPosition(activity.mBoundChaseCamera.getWidth(), activity.mBoundChaseCamera.getHeight() / 2);
 
 		  attachChild(title1);
 		  attachChild(title2);
 
-		  title1.registerEntityModifier(new MoveXModifier(1, title1.getX(), activity.mCamera.getWidth() / 2 - title1.getWidth()));
-		  title2.registerEntityModifier(new MoveXModifier(1, title2.getX(), activity.mCamera.getWidth() / 2));
+		  title1.registerEntityModifier(new MoveXModifier(1, title1.getX(), activity.mBoundChaseCamera.getWidth() / 2 - title1.getWidth()));
+		  title2.registerEntityModifier(new MoveXModifier(1, title2.getX(), activity.mBoundChaseCamera.getWidth() / 2));
 
 		  loadResources();
 
@@ -55,7 +55,7 @@ public class Presentacion extends Scene {
 					org.andengine.util.modifier.IModifier<org.andengine.entity.IEntity> pModifier,
 					org.andengine.entity.IEntity pItem) {
 				// TODO Auto-generated method stub
-				   activity.setCurrentScene(new MenuInicialScene());
+				   activity.setCurrentScene(new Juego());
 
 				
 			}

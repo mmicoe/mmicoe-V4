@@ -2,6 +2,7 @@ package com.example.v4;
 
 
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXLoader;
 import org.andengine.extension.tmx.TMXProperties;
@@ -17,14 +18,14 @@ import android.widget.Toast;
 
 
 
-public class Escena1{
+public class Escena1 {
 	
 	protected int mCactusCount;
 	public static Escena1 instance;
 	
 	public TMXTiledMap mTMXTiledMap;
-	public TMXLayer tmxLayer;
 	
+	public TMXLayer tmxLayer;
 	
 	public static Escena1 getSharedInstance() {
         if (instance == null)
@@ -32,8 +33,8 @@ public class Escena1{
         return instance;
     }
 	
-	public  Escena1(){
-		
+public Escena1() {
+		 	
 		//Recursos Escena1.
 		try {
 			final TMXLoader tmxLoader = new TMXLoader(BaseActivity.getSharedInstance().getAssets(), BaseActivity.getSharedInstance().getTextureManager(), TextureOptions.BILINEAR_PREMULTIPLYALPHA, BaseActivity.getSharedInstance().getVertexBufferObjectManager(), new ITMXTilePropertiesListener() {
@@ -45,18 +46,19 @@ public class Escena1{
 			});
 			mTMXTiledMap = tmxLoader.loadFromAsset("txm/desert.tmx");
 
-			BaseActivity.getSharedInstance().runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					
-				}
-			}); 
+			
 		} catch (final TMXLoadException e) {
 			Debug.e(e);
 		}
 	
-	    tmxLayer = mTMXTiledMap.getTMXLayers().get(0);
+		tmxLayer = mTMXTiledMap.getTMXLayers().get(0);
 		
-}
 	
+}
+
+public TMXLayer getLayer(){
+	
+	     return tmxLayer;
+}
+
 }
