@@ -46,8 +46,13 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	
 	public Engine mEngine;
 	 
+	//Personaje
 	private BitmapTextureAtlas mBitmapTextureAtlas;
 	public TiledTextureRegion mPlayerTextureRegion;
+	
+	//Números flotantes
+	public BitmapTextureAtlas mNumbersTexture;
+	public TiledTextureRegion mNumbersTextureRegion;
 	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
@@ -71,11 +76,16 @@ public class BaseActivity extends SimpleBaseGameActivity {
 		    mFont.load();
 		 
 		    //Recursos Personaje
-		    mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 72, 128, TextureOptions.DEFAULT);
-			mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mBitmapTextureAtlas,this, "player.png", 0, 0, 3, 4);
+		    mBitmapTextureAtlas = new BitmapTextureAtlas(this.getTextureManager(), 72, 32, TextureOptions.DEFAULT);
+		    //imagen columnas= 3 filas=1
+			mPlayerTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mBitmapTextureAtlas,this, "monstruo_capas.png", 0, 0, 3, 1);
 			//mGrassBackground = new RepeatingSpriteBackground(BaseActivity.getSharedInstance().CAMERA_WIDTH,BaseActivity.getSharedInstance().CAMERA_HEIGHT,BaseActivity.getSharedInstance().getTextureManager(), AssetBitmapTextureAtlasSource.create(BaseActivity.getSharedInstance().getAssets(), "gfx/background_grass.png"),BaseActivity.getSharedInstance().getVertexBufferObjectManager());
 			mBitmapTextureAtlas.load();
 			
+			//Los números flotantes
+			this.mNumbersTexture = new BitmapTextureAtlas(this.getTextureManager(), 923, 384, TextureOptions.BILINEAR);
+			this.mNumbersTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mNumbersTexture, this, "numeros.png", 0, 0, 13, 4);
+			this.mNumbersTexture.load();
 			
 		    
 	}
@@ -84,7 +94,7 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	protected Scene onCreateScene() {
 		// TODO Auto-generated method stub
 	
-		    mCurrentScene = new Presentacion();
+		    mCurrentScene = new Juego();
 		    //Comentado porque ya modifico el Background en la clase Presentacion
 		    //mCurrentScene.setBackground(new Background(0.09804f, 0.7274f, 0.8f));
 		    return mCurrentScene;

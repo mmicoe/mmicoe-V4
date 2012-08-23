@@ -53,7 +53,6 @@ public Escena1() {
 	
 		tmxLayer = mTMXTiledMap.getTMXLayers().get(0);
 		
-	
 }
 
 public TMXLayer getLayer(){
