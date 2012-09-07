@@ -44,7 +44,7 @@ public Escena1() {
 					
 				}
 			});
-			mTMXTiledMap = tmxLoader.loadFromAsset("txm/desert.tmx");
+			mTMXTiledMap = tmxLoader.loadFromAsset("txm/textura.tmx");
 
 			
 		} catch (final TMXLoadException e) {

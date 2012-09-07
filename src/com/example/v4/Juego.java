@@ -1,9 +1,14 @@
 package com.example.v4;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.andengine.engine.camera.BoundCamera;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
@@ -14,6 +19,7 @@ import org.andengine.entity.modifier.PathModifier;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
@@ -33,6 +39,7 @@ import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.physics.box2d.util.Vector2Pool;
+import org.andengine.extension.physics.box2d.util.constants.PhysicsConstants;
 import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXTile;
 import org.andengine.input.sensor.acceleration.AccelerationData;
@@ -41,13 +48,19 @@ import org.andengine.input.touch.TouchEvent;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
+
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType;
+import com.badlogic.gdx.physics.box2d.Manifold;
 
 import android.hardware.SensorManager;
 import android.util.Log;
 
-
+import org.andengine.extension.physics.box2d.PhysicsConnector;
 public class Juego extends Scene implements IAccelerationListener {
     
 	
@@ -59,15 +72,34 @@ public class Juego extends Scene implements IAccelerationListener {
 	BaseActivity base_activity;
 
 	Escena1 e1;
-	Personaje p1,p2,p3;
+	Personaje p1;
     Numbers n1;
+	Obstacles o1;
+	
+	AnimatedSprite Player;
 	
     //Variables del mundo físico
     //Subiendo la eslasticidad obtenemos el efecto de partículas gravitando.
-    public static final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 1f, 0.5f);
-    private PhysicsWorld MundoFisico;
-  
+   public static final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(1, 1f, 0.5f);
+	
    
+   public PhysicsWorld MundoFisico;
+  
+    //Obstaculos
+    final int MAX_OBS = 7;
+    //Letras
+    final int MAX_LETRAS = 12;
+  
+    float pos_y;
+    boolean flag = true; //el flag se activa después de los 4 primeros segundos para evitar null.
+    
+    Body perso1;
+    Body body_letras;
+    
+    public int letrasCount = 0;
+    public String fix1_name = "", fix2_name = "";
+    public ContactListener collisionListener;
+    
 	public Juego()
 	{
 		base_activity = BaseActivity.getSharedInstance();
@@ -77,27 +109,28 @@ public class Juego extends Scene implements IAccelerationListener {
 				
 		//************ Parámetros del Mundo físico
 		MundoFisico = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_PLUTO), false);
+		
 		//Establecemos el tamaño del mundo físico que corresponderá al tamaño del tiledMap
 		
 		final VertexBufferObjectManager vertexBufferObjectManager = base_activity.getVertexBufferObjectManager();
 	
-		final Rectangle ground = new Rectangle(0,BOUND_CAMERA_HEIGHT - 2, BOUND_CAMERA_WIDTH, 2, vertexBufferObjectManager);
+		/*final Rectangle ground = new Rectangle(0,BOUND_CAMERA_HEIGHT - 2, BOUND_CAMERA_WIDTH, 2, vertexBufferObjectManager);
 		final Rectangle roof = new Rectangle(0, 0, BOUND_CAMERA_WIDTH, 2, vertexBufferObjectManager);
 		final Rectangle left = new Rectangle(0, 0, 2,BOUND_CAMERA_HEIGHT, vertexBufferObjectManager);
-		final Rectangle right = new Rectangle(BOUND_CAMERA_WIDTH - 2, 0, 2, BOUND_CAMERA_HEIGHT, vertexBufferObjectManager);
+		final Rectangle right = new Rectangle(BOUND_CAMERA_WIDTH - 2, 0, 2, BOUND_CAMERA_HEIGHT, vertexBufferObjectManager);*/
 
 		//CORRECTO TENEMOS EN CUENTA TODO EL MAPA
-		/* final Rectangle ground = new Rectangle(0,e1.getLayer().getHeight() - 2, e1.getLayer().getWidth(), 2, vertexBufferObjectManager);
+		final Rectangle ground = new Rectangle(0,e1.getLayer().getHeight() - 2, e1.getLayer().getWidth(), 2, vertexBufferObjectManager);
 		final Rectangle roof = new Rectangle(0, 0, e1.getLayer().getWidth(), 2, vertexBufferObjectManager);
 		final Rectangle left = new Rectangle(0, 0, 2,e1.getLayer().getHeight(), vertexBufferObjectManager);
-		final Rectangle right = new Rectangle(e1.getLayer().getWidth() - 2, 0, 2, e1.getLayer().getHeight(), vertexBufferObjectManager); */
+		final Rectangle right = new Rectangle(e1.getLayer().getWidth() - 32, 0, 32, e1.getLayer().getHeight(), vertexBufferObjectManager); 
 		
 		final FixtureDef wallFixtureDef = PhysicsFactory.createFixtureDef(0, 0.5f, 0.5f);
 		
-		PhysicsFactory.createBoxBody(MundoFisico, ground, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(MundoFisico, ground, BodyType.StaticBody,wallFixtureDef);
 		PhysicsFactory.createBoxBody(MundoFisico, roof, BodyType.StaticBody, wallFixtureDef);
 		PhysicsFactory.createBoxBody(MundoFisico, left, BodyType.StaticBody, wallFixtureDef);
-		PhysicsFactory.createBoxBody(MundoFisico, right, BodyType.StaticBody, wallFixtureDef);
+		PhysicsFactory.createBoxBody(MundoFisico, right, BodyType.StaticBody,wallFixtureDef);
 
 		attachChild(ground);
 		attachChild(roof);
@@ -105,9 +138,7 @@ public class Juego extends Scene implements IAccelerationListener {
 		attachChild(right);
 		
 		
-		
 		registerUpdateHandler(MundoFisico); 
-		
 		
 		
 		//** Fin parámetros del mundo físico
@@ -115,71 +146,152 @@ public class Juego extends Scene implements IAccelerationListener {
 		instance = this;
 		base_activity = BaseActivity.getSharedInstance();
 		
+		//Creamos personaje
 		p1 = new Personaje();
+		
+		Player = p1.getSprite();
+		
+		//perso1 = PhysicsFactory.createBoxBody(MundoFisico, p1.getSprite(), BodyType.DynamicBody, FIXTURE_DEF);
+		
+		//perso1 no tdebe tener gravedad
+	
+		//Identificamos el personaje
+		//perso1.setUserData("player");
 		
 		attachChild(e1.getLayer());
 		 
-		base_activity.mBoundChaseCamera.setBounds(0,0,e1.getLayer().getHeight(),e1.getLayer().getWidth());
+		base_activity.mBoundChaseCamera.setBounds(0,0,e1.getLayer().getWidth(),e1.getLayer().getHeight());
 		base_activity.mBoundChaseCamera.setBoundsEnabled(true);
 		
 		//Añadimos Personaje a la escena:
-		attachChild(p1.getSprite());
+		attachChild(Player);
 		
+		//MundoFisico.registerPhysicsConnector(new PhysicsConnector(p1.getSprite(), perso1,true,true));
 		
-		registerTouchArea(p1.getSprite());
+		registerTouchArea(Player);
 	
-		base_activity.mBoundChaseCamera.setChaseEntity(p1.getSprite());
-		
+		base_activity.mBoundChaseCamera.setChaseEntity(Player);
+	
+		/*
 		//Los números flotantes
-		n1 = new Numbers();
-			
-		//Mundo físico
-		final Body body;
-		body = PhysicsFactory.createBoxBody(MundoFisico, n1.mNum, BodyType.DynamicBody, FIXTURE_DEF);
-		//body.applyForce(new Vector2(0,-SensorManager.GRAVITY_PLUTO), new Vector2(body.getWorldCenter()));
+		List<Numbers> mNumbers = new LinkedList<Numbers>();
+		for (int i = 0; i <= MAX_LETRAS; i++) {
+			n1 = new Numbers();
+			mNumbers.add(n1);
+			final Body body = PhysicsFactory.createBoxBody(MundoFisico, n1.mNum, BodyType.DynamicBody, FIXTURE_DEF);
+			attachChild(n1.mNum);
+			MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.mNum, body, true, true));
+		}*/
+	  
 		
-		// ************************************************
-		attachChild(n1.mNum);
-		MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.mNum, body, true, true));
-		
- /*
-		 final Path path = new Path(5).to(0, 160).to(0, 500).to(600, 500).to(600, 160).to(0, 160);
-		 p1.getSprite().registerEntityModifier(new LoopEntityModifier(new PathModifier(30, path, null, new IPathModifierListener() {
-				@Override
-				public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-
+		//Obstacles*********************
+				//final FixtureDef ObstaclesFixtureDef = PhysicsFactory.createFixtureDef(10, 0.2f, 0.5f);
+				//Definimos lista de obstaculos
+				List<Obstacles> mObstacles = new LinkedList<Obstacles>();
+				for (int i = 0; i <= MAX_OBS; i++) {
+					o1 = new Obstacles();
+					mObstacles.add(o1);
+					final Body body_Obs = PhysicsFactory.createBoxBody(MundoFisico, o1.Obs,BodyType.StaticBody, FIXTURE_DEF);
+					attachChild(o1.Obs);
+					MundoFisico.registerPhysicsConnector(new PhysicsConnector(o1.Obs, body_Obs, true, true));
 				}
-
-				@Override
-				public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
-					System.out.println("EN JUEGO PERSONAJE *****");
-				}
-
-				@Override
-				public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
-
-				}
-
-				@Override
-				public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
-
-				}
-			})));
-	 
-*/
-		 registerUpdateHandler(new IUpdateHandler() {
+				
+				
+				//Control de colisiones	
+	registerUpdateHandler(new IUpdateHandler() {
 				@Override
 				public void reset() { }
 
 				@Override
 				public void onUpdate(final float pSecondsElapsed) {
 					
+				if (flag==false) {
+				//FOR EACH IN LISTA --->
+					if (Player.collidesWith(n1.getSprite())){
+						 System.out.println("COLISIONNNNNNNN "+ n1.tipo);
+						 
+					}
+					}
+					
 				}
 			}); 
-		
+	
+	//createCollisionListener();
+	//MundoFisico.setContactListener(collisionListener);
+				
+	registerUpdateHandler(new TimerHandler(4f, true, new ITimerCallback() {
+             @Override
+             public void onTimePassed(final TimerHandler pTimerHandler) {
+            	 //letrasCount++;
+            	 //Se hace una lista de los números que van saliendo
+            	 List<Numbers> mNumbers = new LinkedList<Numbers>();
+            	 n1 = new Numbers();
+            	 mNumbers.add(n1);
+                 Body body_letras = PhysicsFactory.createBoxBody(MundoFisico, n1.getSprite(), BodyType.DynamicBody, FIXTURE_DEF);
+
+                 //body_letras.setUserData("letras"+letrasCount);
+                 attachChild(n1.getSprite());
+                 MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.getSprite(), body_letras, true, true));
+                 //n1.getSprite().setUserData("letras"+letrasCount);
+                 flag = false;
+             }
+            
+     }));
+				
 	}
 
+	/*
+	//Colisiones en el mundo físico
+	private void createCollisionListener() {
+		     collisionListener = new ContactListener() {
+			@Override
+			public void beginContact(Contact contact) 
+			{
+				
+				Fixture fix1 = contact.getFixtureA();
+                Fixture fix2 = contact.getFixtureB();
+              //  final Body body_letras = MundoFisico.getPhysicsConnectorManager().findBodyByShape(n1.getSprite());
+                
+                if (fix1.getBody().getUserData() != null && fix2.getBody().getUserData() != null) {
+                    fix1_name = fix1.getBody().getUserData().toString();
+                    fix2_name = fix2.getBody().getUserData().toString();
+                    System.out.println("FIX1: "+fix1_name);
+                    System.out.println("FIX2: "+fix2_name);
+            } else {
+                    fix1_name = "";
+                    fix2_name = "";
+            }
+                
+                if ((fix1_name.equalsIgnoreCase("player") && fix2_name.contains("letras"))
+                        || (fix2_name.equalsIgnoreCase("player") && fix1_name.contains("letras"))) {
+                
+                                  System.out.println("PLAYER GOLPEA ENEMIGO");
+                }
+                
+			  
+			}
 
+			@Override
+			public void endContact(Contact contact)
+			{
+				
+			}
+
+			@Override
+			public void preSolve(Contact contact, Manifold oldManifold)
+			{
+				
+			}
+			@Override
+			public void postSolve(Contact contact, ContactImpulse impulse) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+	
+	}
+	
+	*/
 	
 public static Juego getSharedInstance() {
 		
@@ -193,6 +305,7 @@ public void onAccelerationChanged(final AccelerationData pAccelerationData) {
 	final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(), pAccelerationData.getY());
 	MundoFisico.setGravity(gravity);
 	//Vector2Pool.recycle(gravity);
+	
 }
 
 

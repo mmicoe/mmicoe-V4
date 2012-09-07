@@ -54,6 +54,10 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	public BitmapTextureAtlas mNumbersTexture;
 	public TiledTextureRegion mNumbersTextureRegion;
 	
+	//Obstacles
+		public BitmapTextureAtlas mObstaclesTexture;
+		public TiledTextureRegion mObstaclesTextureRegion;
+		
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		// TODO Auto-generated method stub
@@ -83,10 +87,18 @@ public class BaseActivity extends SimpleBaseGameActivity {
 			mBitmapTextureAtlas.load();
 			
 			//Los números flotantes
-			this.mNumbersTexture = new BitmapTextureAtlas(this.getTextureManager(), 923, 384, TextureOptions.BILINEAR);
-			this.mNumbersTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mNumbersTexture, this, "numeros.png", 0, 0, 13, 4);
+			//imagen de 308X176
+			//Tamaño de la letra: 44x44
+			//Matriz de 
+			//Se trata de una matriz de 7 columnas y 4 filas
+			this.mNumbersTexture = new BitmapTextureAtlas(this.getTextureManager(), 308, 176, TextureOptions.BILINEAR);
+			this.mNumbersTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mNumbersTexture, this, "abecedario.png", 0, 0, 7, 4);
 			this.mNumbersTexture.load();
 			
+			//Obstacles
+			this.mObstaclesTexture = new BitmapTextureAtlas(this.getTextureManager(), 32, 32, TextureOptions.BILINEAR);
+			this.mObstaclesTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mObstaclesTexture, this, "wall_1.png", 0, 0, 1, 1);
+			this.mObstaclesTexture.load();
 		    
 	}
 	
