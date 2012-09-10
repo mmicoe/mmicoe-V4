@@ -1,5 +1,6 @@
 package com.example.v4;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.shape.IShape;
 import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.sprite.TiledSprite;
 import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
@@ -96,9 +98,9 @@ public class Juego extends Scene implements IAccelerationListener {
     Body perso1;
     Body body_letras;
     
-    public int letrasCount = 0;
-    public String fix1_name = "", fix2_name = "";
-    public ContactListener collisionListener;
+
+    //Creamos la lista de elementos
+  	LinkedList<Numbers> Nlist = new LinkedList<Numbers>();	
     
 	public Juego()
 	{
@@ -151,13 +153,6 @@ public class Juego extends Scene implements IAccelerationListener {
 		
 		Player = p1.getSprite();
 		
-		//perso1 = PhysicsFactory.createBoxBody(MundoFisico, p1.getSprite(), BodyType.DynamicBody, FIXTURE_DEF);
-		
-		//perso1 no tdebe tener gravedad
-	
-		//Identificamos el personaje
-		//perso1.setUserData("player");
-		
 		attachChild(e1.getLayer());
 		 
 		base_activity.mBoundChaseCamera.setBounds(0,0,e1.getLayer().getWidth(),e1.getLayer().getHeight());
@@ -166,24 +161,10 @@ public class Juego extends Scene implements IAccelerationListener {
 		//Añadimos Personaje a la escena:
 		attachChild(Player);
 		
-		//MundoFisico.registerPhysicsConnector(new PhysicsConnector(p1.getSprite(), perso1,true,true));
-		
 		registerTouchArea(Player);
 	
 		base_activity.mBoundChaseCamera.setChaseEntity(Player);
 	
-		/*
-		//Los números flotantes
-		List<Numbers> mNumbers = new LinkedList<Numbers>();
-		for (int i = 0; i <= MAX_LETRAS; i++) {
-			n1 = new Numbers();
-			mNumbers.add(n1);
-			final Body body = PhysicsFactory.createBoxBody(MundoFisico, n1.mNum, BodyType.DynamicBody, FIXTURE_DEF);
-			attachChild(n1.mNum);
-			MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.mNum, body, true, true));
-		}*/
-	  
-		
 		//Obstacles*********************
 				//final FixtureDef ObstaclesFixtureDef = PhysicsFactory.createFixtureDef(10, 0.2f, 0.5f);
 				//Definimos lista de obstaculos
@@ -196,7 +177,7 @@ public class Juego extends Scene implements IAccelerationListener {
 					MundoFisico.registerPhysicsConnector(new PhysicsConnector(o1.Obs, body_Obs, true, true));
 				}
 				
-				
+					
 				//Control de colisiones	
 	registerUpdateHandler(new IUpdateHandler() {
 				@Override
@@ -206,11 +187,17 @@ public class Juego extends Scene implements IAccelerationListener {
 				public void onUpdate(final float pSecondsElapsed) {
 					
 				if (flag==false) {
-				//FOR EACH IN LISTA --->
-					if (Player.collidesWith(n1.getSprite())){
-						 System.out.println("COLISIONNNNNNNN "+ n1.tipo);
-						 
-					}
+
+					Iterator<Numbers> i = Nlist.listIterator();
+					while(i.hasNext()) {
+						Numbers b = (Numbers) i.next(); //Obtengo el elemento contenido 
+				       
+				          if (Player.collidesWith(b.getSprite())){
+								 System.out.println("COLISIONNNNNNNN "+ b.tipo);
+								 
+							}
+				          
+				}
 					}
 					
 				}
@@ -222,76 +209,22 @@ public class Juego extends Scene implements IAccelerationListener {
 	registerUpdateHandler(new TimerHandler(4f, true, new ITimerCallback() {
              @Override
              public void onTimePassed(final TimerHandler pTimerHandler) {
-            	 //letrasCount++;
-            	 //Se hace una lista de los números que van saliendo
-            	 List<Numbers> mNumbers = new LinkedList<Numbers>();
+            	
             	 n1 = new Numbers();
-            	 mNumbers.add(n1);
+            	 Nlist.add(n1);
                  Body body_letras = PhysicsFactory.createBoxBody(MundoFisico, n1.getSprite(), BodyType.DynamicBody, FIXTURE_DEF);
 
-                 //body_letras.setUserData("letras"+letrasCount);
                  attachChild(n1.getSprite());
                  MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.getSprite(), body_letras, true, true));
-                 //n1.getSprite().setUserData("letras"+letrasCount);
+                
                  flag = false;
+                 
              }
             
      }));
 				
 	}
 
-	/*
-	//Colisiones en el mundo físico
-	private void createCollisionListener() {
-		     collisionListener = new ContactListener() {
-			@Override
-			public void beginContact(Contact contact) 
-			{
-				
-				Fixture fix1 = contact.getFixtureA();
-                Fixture fix2 = contact.getFixtureB();
-              //  final Body body_letras = MundoFisico.getPhysicsConnectorManager().findBodyByShape(n1.getSprite());
-                
-                if (fix1.getBody().getUserData() != null && fix2.getBody().getUserData() != null) {
-                    fix1_name = fix1.getBody().getUserData().toString();
-                    fix2_name = fix2.getBody().getUserData().toString();
-                    System.out.println("FIX1: "+fix1_name);
-                    System.out.println("FIX2: "+fix2_name);
-            } else {
-                    fix1_name = "";
-                    fix2_name = "";
-            }
-                
-                if ((fix1_name.equalsIgnoreCase("player") && fix2_name.contains("letras"))
-                        || (fix2_name.equalsIgnoreCase("player") && fix1_name.contains("letras"))) {
-                
-                                  System.out.println("PLAYER GOLPEA ENEMIGO");
-                }
-                
-			  
-			}
-
-			@Override
-			public void endContact(Contact contact)
-			{
-				
-			}
-
-			@Override
-			public void preSolve(Contact contact, Manifold oldManifold)
-			{
-				
-			}
-			@Override
-			public void postSolve(Contact contact, ContactImpulse impulse) {
-				// TODO Auto-generated method stub
-				
-			}
-		};
-	
-	}
-	
-	*/
 	
 public static Juego getSharedInstance() {
 		
@@ -304,7 +237,7 @@ public void onAccelerationChanged(final AccelerationData pAccelerationData) {
 	
 	final Vector2 gravity = Vector2Pool.obtain(pAccelerationData.getX(), pAccelerationData.getY());
 	MundoFisico.setGravity(gravity);
-	//Vector2Pool.recycle(gravity);
+	
 	
 }
 
