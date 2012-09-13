@@ -55,7 +55,7 @@ public class Presentacion extends Scene {
 					org.andengine.util.modifier.IModifier<org.andengine.entity.IEntity> pModifier,
 					org.andengine.entity.IEntity pItem) {
 				// TODO Auto-generated method stub
-				   activity.setCurrentScene(new MenuInicialScene());
+				   activity.setCurrentScene(new Juego());
 
 				
 			}

@@ -45,7 +45,7 @@ public Personaje() {
 		final float centerX = (juego_activity.BOUND_CAMERA_WIDTH - base_activity.mPlayerTextureRegion.getWidth()) / 2;
 		final float centerY = (juego_activity.BOUND_CAMERA_HEIGHT - base_activity.mPlayerTextureRegion.getHeight()) / 2;
 
-		sprite = new AnimatedSprite(centerX, centerY, base_activity.mPlayerTextureRegion, base_activity.getVertexBufferObjectManager())
+		sprite = new AnimatedSprite(centerX+60, centerY+60, base_activity.mPlayerTextureRegion, base_activity.getVertexBufferObjectManager())
 		{
 			//Movimiento Touch
 			@Override

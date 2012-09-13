@@ -1,5 +1,9 @@
 package com.example.v4;
 
+import java.io.IOException;
+
+import org.andengine.audio.sound.Sound;
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.BoundCamera;
 import org.andengine.engine.camera.Camera;
@@ -44,7 +48,7 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	public Scene mCurrentScene;
 	public static BaseActivity instance;
 	
-	public Engine mEngine;
+	//public Engine mEngine;
 	 
 	//Personaje
 	private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -57,7 +61,12 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	//Obstacles
 		public BitmapTextureAtlas mObstaclesTexture;
 		public TiledTextureRegion mObstaclesTextureRegion;
-		
+	
+	//Sonido_letras que salen
+	Sound s1;
+	//Collision
+	Sound s2;
+	
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		// TODO Auto-generated method stub
@@ -67,7 +76,14 @@ public class BaseActivity extends SimpleBaseGameActivity {
 		    //mCamera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
 		    //return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mCamera);
 		    mBoundChaseCamera = new BoundCamera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-		    return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mBoundChaseCamera);
+		  
+		    //Para el uso del Sonido necesito crear un objeto de EngineOptions y activarlo.
+		    //return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mBoundChaseCamera);
+		    
+		    EngineOptions e1 = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED, new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),  mBoundChaseCamera);
+	        e1.getAudioOptions().setNeedsSound(true);
+		    
+		    return e1;
 	}
 	
 	@Override
@@ -100,6 +116,22 @@ public class BaseActivity extends SimpleBaseGameActivity {
 			this.mObstaclesTextureRegion = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(this.mObstaclesTexture, this, "wall_1.png", 0, 0, 1, 1);
 			this.mObstaclesTexture.load();
 		    
+		
+			//Sonido
+			SoundFactory.setAssetBasePath("mfx/");
+			try {
+				//Letras que salen
+                s1 = SoundFactory.createSoundFromAsset(this.getSoundManager(), this, "chip017.wav");
+        } catch (final IOException e) {
+                Debug.e("Error", e);
+        }
+			try {
+				//Collision
+                s2 = SoundFactory.createSoundFromAsset(this.getSoundManager(), this, "crash.wav");
+        } catch (final IOException e) {
+                Debug.e("Error", e);
+        }
+			
 	}
 	
 	@Override

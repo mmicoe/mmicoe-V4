@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.andengine.audio.sound.SoundFactory;
 import org.andengine.engine.camera.BoundCamera;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;
@@ -15,6 +16,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.RatioResolutionPolicy;
 
 import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.LoopEntityModifier;
 import org.andengine.entity.modifier.PathModifier;
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -178,7 +180,7 @@ public class Juego extends Scene implements IAccelerationListener {
 				}
 				
 					
-				//Control de colisiones	
+	//Control de colisiones	
 	registerUpdateHandler(new IUpdateHandler() {
 				@Override
 				public void reset() { }
@@ -194,7 +196,8 @@ public class Juego extends Scene implements IAccelerationListener {
 				       
 				          if (Player.collidesWith(b.getSprite())){
 								 System.out.println("COLISIONNNNNNNN "+ b.tipo);
-								 
+								//Collision
+				                 base_activity.s2.play();
 							}
 				          
 				}
@@ -205,10 +208,12 @@ public class Juego extends Scene implements IAccelerationListener {
 	
 	//createCollisionListener();
 	//MundoFisico.setContactListener(collisionListener);
-				
+	
+	
 	registerUpdateHandler(new TimerHandler(4f, true, new ITimerCallback() {
              @Override
              public void onTimePassed(final TimerHandler pTimerHandler) {
+            	
             	
             	 n1 = new Numbers();
             	 Nlist.add(n1);
@@ -218,7 +223,9 @@ public class Juego extends Scene implements IAccelerationListener {
                  MundoFisico.registerPhysicsConnector(new PhysicsConnector(n1.getSprite(), body_letras, true, true));
                 
                  flag = false;
-                 
+                 //Sonido letras_out
+                 base_activity.s1.play();
+                
              }
             
      }));
@@ -248,6 +255,7 @@ public void onAccelerationAccuracyChanged(AccelerationData pAccelerationData) {
 	// TODO Auto-generated method stub
 	
 }
+
 
 }
 

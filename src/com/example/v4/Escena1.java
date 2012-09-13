@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 public class Escena1 {
 	
-	protected int mCactusCount;
 	public static Escena1 instance;
 	
 	public TMXTiledMap mTMXTiledMap;
