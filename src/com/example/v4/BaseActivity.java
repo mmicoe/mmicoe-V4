@@ -1,6 +1,7 @@
 package com.example.v4;
 
 import java.io.IOException;
+import java.util.LinkedList;
 
 import org.andengine.audio.sound.Sound;
 import org.andengine.audio.sound.SoundFactory;
@@ -48,7 +49,7 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	public Scene mCurrentScene;
 	public static BaseActivity instance;
 	
-	//public Engine mEngine;
+	public Engine mEngine;
 	 
 	//Personaje
 	private BitmapTextureAtlas mBitmapTextureAtlas;
@@ -66,7 +67,9 @@ public class BaseActivity extends SimpleBaseGameActivity {
 	Sound s1;
 	//Collision
 	Sound s2;
-	
+	//Letras_adivinar
+    Sound s3;
+    
 	@Override
 	public EngineOptions onCreateEngineOptions() {
 		// TODO Auto-generated method stub
@@ -131,7 +134,12 @@ public class BaseActivity extends SimpleBaseGameActivity {
         } catch (final IOException e) {
                 Debug.e("Error", e);
         }
-			
+			try {
+				//Collision
+                s3 = SoundFactory.createSoundFromAsset(this.getSoundManager(), this, "show.wav");
+        } catch (final IOException e) {
+                Debug.e("Error", e);
+        }	
 	}
 	
 	@Override
